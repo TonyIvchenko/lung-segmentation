@@ -1,9 +1,6 @@
 import torch
 import torchvision
 
-import pandas as pd
-import numpy as np
-
 
 class Block(torch.nn.Module):
     def __init__(self, in_channels, mid_channel, out_channels, batch_norm=False):
