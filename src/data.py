@@ -2,21 +2,39 @@ import torch
 import torchvision
 
 import numpy as np
+from pathlib import Path
 
 from PIL import Image
 
 
 class LungDataset(torch.utils.data.Dataset):
     def __init__(self, origin_mask_list, origins_folder, masks_folder, transforms=None):
-        self.origin_mask_list = origin_mask_list
-        self.origins_folder = origins_folder
-        self.masks_folder = masks_folder
+        self.origin_mask_list = list(origin_mask_list)
+        self.origins_folder = Path(origins_folder)
+        self.masks_folder = Path(masks_folder)
         self.transforms = transforms
+
+        if not self.origins_folder.exists():
+            raise FileNotFoundError(f"Origins folder not found: {self.origins_folder}")
+        if not self.masks_folder.exists():
+            raise FileNotFoundError(f"Masks folder not found: {self.masks_folder}")
+
+    def _sample_paths(self, origin_name, mask_name):
+        origin_path = self.origins_folder / f"{origin_name}.png"
+        mask_path = self.masks_folder / f"{mask_name}.png"
+
+        if not origin_path.exists():
+            raise FileNotFoundError(f"Origin image not found: {origin_path}")
+        if not mask_path.exists():
+            raise FileNotFoundError(f"Mask image not found: {mask_path}")
+
+        return origin_path, mask_path
     
     def __getitem__(self, idx):
         origin_name, mask_name = self.origin_mask_list[idx]
-        origin = Image.open(self.origins_folder / (origin_name + ".png")).convert("P")
-        mask = Image.open(self.masks_folder / (mask_name + ".png"))
+        origin_path, mask_path = self._sample_paths(origin_name, mask_name)
+        origin = Image.open(origin_path).convert("P")
+        mask = Image.open(mask_path)
         if self.transforms is not None:
             origin, mask = self.transforms((origin, mask))
             
