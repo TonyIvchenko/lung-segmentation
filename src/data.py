@@ -8,11 +8,24 @@ from PIL import Image
 
 
 class LungDataset(torch.utils.data.Dataset):
-    def __init__(self, origin_mask_list, origins_folder, masks_folder, transforms=None):
+    def __init__(
+        self,
+        origin_mask_list,
+        origins_folder,
+        masks_folder,
+        transforms=None,
+        origin_mode="L",
+        mask_threshold=128,
+    ):
         self.origin_mask_list = list(origin_mask_list)
         self.origins_folder = Path(origins_folder)
         self.masks_folder = Path(masks_folder)
         self.transforms = transforms
+        self.origin_mode = origin_mode
+        self.mask_threshold = mask_threshold
+
+        if not 0 <= self.mask_threshold <= 255:
+            raise ValueError("mask_threshold must be in range [0, 255]")
 
         if not self.origins_folder.exists():
             raise FileNotFoundError(f"Origins folder not found: {self.origins_folder}")
@@ -33,15 +46,15 @@ class LungDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         origin_name, mask_name = self.origin_mask_list[idx]
         origin_path, mask_path = self._sample_paths(origin_name, mask_name)
-        origin = Image.open(origin_path).convert("P")
-        mask = Image.open(mask_path)
+        origin = Image.open(origin_path).convert(self.origin_mode)
+        mask = Image.open(mask_path).convert("L")
         if self.transforms is not None:
             origin, mask = self.transforms((origin, mask))
             
         origin = torchvision.transforms.functional.to_tensor(origin) - 0.5
     
         mask = np.array(mask)
-        mask = (torch.tensor(mask) > 128).long() 
+        mask = (torch.tensor(mask) > self.mask_threshold).long() 
         return origin, mask
         
     
