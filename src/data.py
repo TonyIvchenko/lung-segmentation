@@ -100,8 +100,16 @@ class Resize():
         
     def __call__(self, sample):
         origin, mask = sample
-        origin = torchvision.transforms.functional.resize(origin, self.output_size)
-        mask = torchvision.transforms.functional.resize(mask, self.output_size)
+        origin = torchvision.transforms.functional.resize(
+            origin,
+            self.output_size,
+            interpolation=Image.BILINEAR,
+        )
+        mask = torchvision.transforms.functional.resize(
+            mask,
+            self.output_size,
+            interpolation=Image.NEAREST,
+        )
         
         return origin, mask
 
