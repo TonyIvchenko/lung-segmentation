@@ -114,6 +114,40 @@ class Resize():
         return origin, mask
 
 
+class ComposePair():
+    def __init__(self, transforms):
+        self.transforms = list(transforms)
+
+    def __call__(self, sample):
+        for transform in self.transforms:
+            sample = transform(sample)
+        return sample
+
+
+class RandomHorizontalFlipPair():
+    def __init__(self, p=0.5):
+        self.p = p
+
+    def __call__(self, sample):
+        origin, mask = sample
+        if np.random.random() < self.p:
+            origin = torchvision.transforms.functional.hflip(origin)
+            mask = torchvision.transforms.functional.hflip(mask)
+        return origin, mask
+
+
+class RandomVerticalFlipPair():
+    def __init__(self, p=0.5):
+        self.p = p
+
+    def __call__(self, sample):
+        origin, mask = sample
+        if np.random.random() < self.p:
+            origin = torchvision.transforms.functional.vflip(origin)
+            mask = torchvision.transforms.functional.vflip(mask)
+        return origin, mask
+
+
 def blend(origin, mask1=None, mask2=None):
     img = torchvision.transforms.functional.to_pil_image(origin + 0.5).convert("RGB")
     if mask1 is not None:
