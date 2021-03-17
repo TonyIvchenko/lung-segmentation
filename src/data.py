@@ -64,12 +64,16 @@ class LungDataset(torch.utils.data.Dataset):
     
 class Pad():
     def __init__(self, max_padding):
+        if max_padding < 0:
+            raise ValueError("max_padding must be non-negative")
         self.max_padding = max_padding
         
     def __call__(self, sample):
         origin, mask = sample
-        padding = np.random.randint(0, self.max_padding)
-#         origin = torchvision.transforms.functional.pad(origin, padding=padding, padding_mode="symmetric")
+        if self.max_padding == 0:
+            return origin, mask
+
+        padding = np.random.randint(0, self.max_padding + 1)
         origin = torchvision.transforms.functional.pad(origin, padding=padding, fill=0)
         mask = torchvision.transforms.functional.pad(mask, padding=padding, fill=0)
         return origin, mask
@@ -77,20 +81,39 @@ class Pad():
 
 class Crop():
     def __init__(self, max_shift):
+        if max_shift < 0:
+            raise ValueError("max_shift must be non-negative")
         self.max_shift = max_shift
         
     def __call__(self, sample):
         origin, mask = sample
-        tl_shift = np.random.randint(0, self.max_shift)
-        br_shift = np.random.randint(0, self.max_shift)
+        if self.max_shift == 0:
+            return origin, mask
+
+        top_shift = np.random.randint(0, self.max_shift + 1)
+        bottom_shift = np.random.randint(0, self.max_shift + 1)
+        left_shift = np.random.randint(0, self.max_shift + 1)
+        right_shift = np.random.randint(0, self.max_shift + 1)
         origin_w, origin_h = origin.size
-        crop_w = origin_w - tl_shift - br_shift
-        crop_h = origin_h - tl_shift - br_shift
-        
-        origin = torchvision.transforms.functional.crop(origin, tl_shift, tl_shift,
-                                                        crop_h, crop_w)
-        mask = torchvision.transforms.functional.crop(mask, tl_shift, tl_shift,
-                                                        crop_h, crop_w)
+        crop_w = origin_w - left_shift - right_shift
+        crop_h = origin_h - top_shift - bottom_shift
+        if crop_w <= 0 or crop_h <= 0:
+            return origin, mask
+
+        origin = torchvision.transforms.functional.crop(
+            origin,
+            top_shift,
+            left_shift,
+            crop_h,
+            crop_w,
+        )
+        mask = torchvision.transforms.functional.crop(
+            mask,
+            top_shift,
+            left_shift,
+            crop_h,
+            crop_w,
+        )
         return origin, mask
 
 
