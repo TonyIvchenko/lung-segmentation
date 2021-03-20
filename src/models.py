@@ -2,6 +2,21 @@ import torch
 import torchvision
 
 
+_ALIGN_CORNERS_MODES = {"linear", "bilinear", "bicubic", "trilinear"}
+
+
+def _upsample(x, size, mode):
+    if mode in _ALIGN_CORNERS_MODES:
+        return torch.nn.functional.interpolate(
+            x,
+            size=size,
+            mode=mode,
+            align_corners=False,
+        )
+
+    return torch.nn.functional.interpolate(x, size=size, mode=mode)
+
+
 class Block(torch.nn.Module):
     def __init__(self, in_channels, mid_channel, out_channels, batch_norm=False):
         super().__init__()
@@ -29,7 +44,7 @@ class Block(torch.nn.Module):
 
 class UNet(torch.nn.Module):
     def up(self, x, size):
-        return torch.nn.functional.interpolate(x, size=size, mode=self.upscale_mode)
+        return _upsample(x, size, self.upscale_mode)
     
     def down(self, x):
         return torch.nn.functional.max_pool2d(x, kernel_size=2)
@@ -76,7 +91,7 @@ class UNet(torch.nn.Module):
 
 class PretrainedUNet(torch.nn.Module):
     def up(self, x, size):
-        return torch.nn.functional.interpolate(x, size=size, mode=self.upscale_mode)
+        return _upsample(x, size, self.upscale_mode)
     
     def down(self, x):
         return torch.nn.functional.max_pool2d(x, kernel_size=2)
