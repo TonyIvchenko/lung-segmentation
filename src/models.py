@@ -17,6 +17,15 @@ def _upsample(x, size, mode):
     return torch.nn.functional.interpolate(x, size=size, mode=mode)
 
 
+def _load_vgg11_features(pretrained):
+    # Support both old and new torchvision APIs.
+    if hasattr(torchvision.models, "VGG11_Weights"):
+        weights = torchvision.models.VGG11_Weights.DEFAULT if pretrained else None
+        return torchvision.models.vgg11(weights=weights).features
+
+    return torchvision.models.vgg11(pretrained=pretrained).features
+
+
 class Block(torch.nn.Module):
     def __init__(self, in_channels, mid_channel, out_channels, batch_norm=False):
         super().__init__()
@@ -96,25 +105,33 @@ class PretrainedUNet(torch.nn.Module):
     def down(self, x):
         return torch.nn.functional.max_pool2d(x, kernel_size=2)
     
-    def __init__(self, in_channels, out_channels, batch_norm=False, upscale_mode="nearest"):
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        batch_norm=False,
+        upscale_mode="nearest",
+        pretrained=True,
+    ):
         super().__init__()
         
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.batch_norm = batch_norm
         self.upscale_mode = upscale_mode
+        self.pretrained = pretrained
         
         self.init_conv = torch.nn.Conv2d(in_channels, 3, 1)
         
-        endcoder = torchvision.models.vgg11(pretrained=True).features
-        self.conv1 = endcoder[0]   # 64
-        self.conv2 = endcoder[3]   # 128
-        self.conv3 = endcoder[6]   # 256
-        self.conv3s = endcoder[8]  # 256
-        self.conv4 = endcoder[11]   # 512
-        self.conv4s = endcoder[13]  # 512
-        self.conv5 = endcoder[16]  # 512
-        self.conv5s = endcoder[18] # 512
+        encoder = _load_vgg11_features(pretrained=pretrained)
+        self.conv1 = encoder[0]   # 64
+        self.conv2 = encoder[3]   # 128
+        self.conv3 = encoder[6]   # 256
+        self.conv3s = encoder[8]  # 256
+        self.conv4 = encoder[11]   # 512
+        self.conv4s = encoder[13]  # 512
+        self.conv5 = encoder[16]  # 512
+        self.conv5s = encoder[18] # 512
     
         self.center = Block(512, 512, 256, batch_norm)
         
