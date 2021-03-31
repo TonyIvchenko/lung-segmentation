@@ -27,3 +27,16 @@ def dice(y_true, y_pred, eps=1e-7):
     denominator = y_true_flat.sum(dim=1) + y_pred_flat.sum(dim=1) + eps
     score = (2 * intersection) / denominator
     return score.mean()
+
+
+def predictions_to_masks(logits):
+    """Convert segmentation logits [N, C, H, W] into hard class masks [N, H, W]."""
+    return torch.argmax(logits, dim=1)
+
+
+def jaccard_from_logits(y_true, logits, eps=1e-7):
+    return jaccard(y_true, predictions_to_masks(logits), eps=eps)
+
+
+def dice_from_logits(y_true, logits, eps=1e-7):
+    return dice(y_true, predictions_to_masks(logits), eps=eps)

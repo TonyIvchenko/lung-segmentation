@@ -10,7 +10,7 @@ from .data import (
     Resize,
     blend,
 )
-from .metrics import dice, jaccard
+from .metrics import dice, dice_from_logits, jaccard, jaccard_from_logits, predictions_to_masks
 from .models import PretrainedUNet, UNet
 
 __all__ = [
@@ -25,5 +25,8 @@ __all__ = [
     "UNet",
     "blend",
     "dice",
+    "dice_from_logits",
     "jaccard",
+    "jaccard_from_logits",
+    "predictions_to_masks",
 ]
