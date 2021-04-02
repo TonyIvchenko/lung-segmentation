@@ -12,6 +12,7 @@ from .data import (
 )
 from .metrics import dice, dice_from_logits, jaccard, jaccard_from_logits, predictions_to_masks
 from .models import PretrainedUNet, UNet
+from .utils import count_parameters, resolve_device, set_seed
 
 __all__ = [
     "ComposePair",
@@ -29,4 +30,7 @@ __all__ = [
     "jaccard",
     "jaccard_from_logits",
     "predictions_to_masks",
+    "count_parameters",
+    "resolve_device",
+    "set_seed",
 ]
