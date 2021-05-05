@@ -3,6 +3,17 @@
 
 # Byte-compiled
 __pycache__
+*.pyc
+
+# Test and tooling artifacts
+.pytest_cache
+.mypy_cache
+.coverage
+htmlcov
+
+# Generated outputs
+outputs
+logs
 
 # Image dataset
 input
@@ -14,3 +25,4 @@ models/*
 
 # Virtual Env
 venv
+.venv
