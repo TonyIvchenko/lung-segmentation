@@ -10,6 +10,26 @@ Whole dataset was randomly divided into train (0.8 of total) validation (0.1 spl
 The main task is to implement pixel-wise segmentation on the available data to detect lung area.
 Download link on the dataset https://drive.google.com/file/d/1ffbbyoPf-I3Y0iGbBahXpWqYdGd7xxQQ/view.
 
+## CLI workflow
+The repository now includes reusable command-line scripts in `scripts/`:
+
+- `scripts/make_splits.py` - build reproducible train/val/test splits
+- `scripts/train.py` - train UNet or pretrained UNet and save best checkpoint
+- `scripts/evaluate.py` - compute loss/Jaccard/Dice for a checkpoint on any split
+- `scripts/predict.py` - infer masks for single images and optionally save overlays
+- `scripts/preview_dataset.py` - export a visual preview of sampled training pairs
+
+Example:
+
+```bash
+python3 scripts/train.py \
+  --data-folder input/dataset \
+  --splits splits.pk \
+  --model pretrained-unet \
+  --batch-norm \
+  --output models/unet-cli.pt
+```
+
 ## Proposed solution
 The most obvious solution for semantic segmentation problems is UNet - fully convolutional network with an encoder-decoder path. High-resolution features from the contracting path are combined with the upsampled output in order to predict more precise output based on this information, which is the main idea of this architecture.
 
