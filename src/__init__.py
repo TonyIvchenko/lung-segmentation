@@ -1,5 +1,6 @@
 """Core package for lung segmentation models and utilities."""
 
+from .checkpoints import build_model, load_checkpoint, save_checkpoint
 from .data import (
     ComposePair,
     Crop,
@@ -33,4 +34,7 @@ __all__ = [
     "count_parameters",
     "resolve_device",
     "set_seed",
+    "build_model",
+    "load_checkpoint",
+    "save_checkpoint",
 ]
