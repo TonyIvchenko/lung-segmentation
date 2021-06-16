@@ -7,6 +7,7 @@ from pathlib import Path
 import torch
 from torch.utils.data import DataLoader
 
+from src.checkpoints import build_model, save_checkpoint
 from src.data import (
     ComposePair,
     Crop,
@@ -17,26 +18,7 @@ from src.data import (
     Resize,
 )
 from src.metrics import dice_from_logits, jaccard_from_logits
-from src.models import PretrainedUNet, UNet
 from src.utils import resolve_device, set_seed
-
-
-def build_model(args):
-    if args.model == "unet":
-        return UNet(
-            in_channels=1,
-            out_channels=2,
-            batch_norm=args.batch_norm,
-            upscale_mode=args.upscale_mode,
-        )
-
-    return PretrainedUNet(
-        in_channels=1,
-        out_channels=2,
-        batch_norm=args.batch_norm,
-        upscale_mode=args.upscale_mode,
-        pretrained=args.pretrained_encoder,
-    )
 
 
 def build_transforms(image_size):
@@ -125,7 +107,12 @@ def train(args):
 
     device = resolve_device(prefer_cuda=not args.cpu)
 
-    model = build_model(args).to(device)
+    model = build_model(
+        args.model,
+        batch_norm=args.batch_norm,
+        upscale_mode=args.upscale_mode,
+        pretrained=args.pretrained_encoder,
+    ).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
 
     best_val_jaccard = float("-inf")
@@ -175,15 +162,12 @@ def train(args):
 
         if log_line["val_jaccard"] >= best_val_jaccard:
             best_val_jaccard = log_line["val_jaccard"]
-            args.output.parent.mkdir(parents=True, exist_ok=True)
-            torch.save(
-                {
-                    "model": model.state_dict(),
-                    "args": vars(args),
-                    "best_val_jaccard": best_val_jaccard,
-                    "history": history,
-                },
-                args.output,
+            save_checkpoint(
+                path=args.output,
+                model=model,
+                args=vars(args),
+                metrics={"best_val_jaccard": best_val_jaccard},
+                history=history,
             )
             print(f"saved checkpoint to {args.output}")
 
