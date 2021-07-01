@@ -6,29 +6,9 @@ import torch
 import torchvision
 from PIL import Image
 
+from src.checkpoints import load_checkpoint
 from src.data import blend
-from src.models import PretrainedUNet, UNet
 from src.utils import resolve_device
-
-
-def load_model(checkpoint_path, model_name, device):
-    checkpoint = torch.load(checkpoint_path, map_location=device)
-
-    if model_name == "unet":
-        model = UNet(in_channels=1, out_channels=2, batch_norm=False, upscale_mode="bilinear")
-    else:
-        model = PretrainedUNet(
-            in_channels=1,
-            out_channels=2,
-            batch_norm=True,
-            upscale_mode="bilinear",
-            pretrained=False,
-        )
-
-    model.load_state_dict(checkpoint["model"])
-    model.to(device)
-    model.eval()
-    return model
 
 
 def preprocess_image(image_path, image_size):
@@ -58,7 +38,13 @@ def main():
     args = parse_args()
     device = resolve_device(prefer_cuda=not args.cpu)
 
-    model = load_model(args.checkpoint, args.model, device)
+    model, _ = load_checkpoint(
+        path=args.checkpoint,
+        model_name=args.model,
+        device=device,
+        batch_norm=args.model == "pretrained-unet",
+        upscale_mode="bilinear",
+    )
 
     origin = preprocess_image(args.image, args.image_size)
     input_tensor = origin.unsqueeze(0).to(device)
