@@ -40,8 +40,24 @@ def save_checkpoint(path, model, args=None, metrics=None, history=None):
     torch.save(payload, path)
 
 
-def load_checkpoint(path, model_name, device, batch_norm=False, upscale_mode="bilinear"):
+def _infer_model_config(checkpoint, model_name, batch_norm, upscale_mode):
+    args = checkpoint.get("args", {})
+    inferred_model_name = model_name or args.get("model", "pretrained-unet")
+    inferred_batch_norm = batch_norm or args.get("batch_norm", inferred_model_name == "pretrained-unet")
+    inferred_upscale_mode = upscale_mode or args.get("upscale_mode", "bilinear")
+
+    return inferred_model_name, inferred_batch_norm, inferred_upscale_mode
+
+
+def load_checkpoint(path, model_name, device, batch_norm=False, upscale_mode=None):
     checkpoint = torch.load(path, map_location=device)
+    model_name, batch_norm, upscale_mode = _infer_model_config(
+        checkpoint=checkpoint,
+        model_name=model_name,
+        batch_norm=batch_norm,
+        upscale_mode=upscale_mode,
+    )
+
     model = build_model(
         model_name,
         batch_norm=batch_norm,
