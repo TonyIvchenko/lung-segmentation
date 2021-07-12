@@ -8,6 +8,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from src.checkpoints import build_model, save_checkpoint
+from src.config import TrainConfig
 from src.data import (
     ComposePair,
     Crop,
@@ -178,19 +179,20 @@ def train(args):
 
 
 def parse_args():
+    defaults = TrainConfig()
     parser = argparse.ArgumentParser(description="Train lung segmentation models")
-    parser.add_argument("--data-folder", type=Path, default=Path("input/dataset"))
-    parser.add_argument("--splits", type=Path, default=Path("splits.pk"))
-    parser.add_argument("--output", type=Path, default=Path("models/unet-cli.pt"))
+    parser.add_argument("--data-folder", type=Path, default=defaults.data_folder)
+    parser.add_argument("--splits", type=Path, default=defaults.splits)
+    parser.add_argument("--output", type=Path, default=defaults.output)
     parser.add_argument("--history-output", type=Path)
-    parser.add_argument("--model", choices=["unet", "pretrained-unet"], default="pretrained-unet")
-    parser.add_argument("--epochs", type=int, default=50)
-    parser.add_argument("--batch-size", type=int, default=4)
-    parser.add_argument("--learning-rate", type=float, default=5e-4)
-    parser.add_argument("--image-size", type=int, default=512)
-    parser.add_argument("--num-workers", type=int, default=0)
-    parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--upscale-mode", default="bilinear")
+    parser.add_argument("--model", choices=["unet", "pretrained-unet"], default=defaults.model)
+    parser.add_argument("--epochs", type=int, default=defaults.epochs)
+    parser.add_argument("--batch-size", type=int, default=defaults.batch_size)
+    parser.add_argument("--learning-rate", type=float, default=defaults.learning_rate)
+    parser.add_argument("--image-size", type=int, default=defaults.image_size)
+    parser.add_argument("--num-workers", type=int, default=defaults.num_workers)
+    parser.add_argument("--seed", type=int, default=defaults.seed)
+    parser.add_argument("--upscale-mode", default=defaults.upscale_mode)
     parser.add_argument("--batch-norm", action="store_true")
     parser.add_argument("--pretrained-encoder", action="store_true")
     parser.add_argument("--cpu", action="store_true")
