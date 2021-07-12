@@ -1,6 +1,7 @@
 """Core package for lung segmentation models and utilities."""
 
 from .checkpoints import build_model, load_checkpoint, save_checkpoint
+from .config import TrainConfig
 from .data import (
     ComposePair,
     Crop,
@@ -37,4 +38,5 @@ __all__ = [
     "build_model",
     "load_checkpoint",
     "save_checkpoint",
+    "TrainConfig",
 ]
