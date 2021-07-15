@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import csv
 import json
 import pickle
 from pathlib import Path
@@ -177,6 +178,16 @@ def train(args):
         with open(args.history_output, "w", encoding="utf-8") as history_file:
             json.dump(history, history_file, indent=2)
 
+    if args.history_csv is not None:
+        args.history_csv.parent.mkdir(parents=True, exist_ok=True)
+        with open(args.history_csv, "w", newline="", encoding="utf-8") as csv_file:
+            writer = csv.DictWriter(
+                csv_file,
+                fieldnames=["epoch", "train_loss", "val_loss", "val_jaccard", "val_dice"],
+            )
+            writer.writeheader()
+            writer.writerows(history)
+
 
 def parse_args():
     defaults = TrainConfig()
@@ -185,6 +196,7 @@ def parse_args():
     parser.add_argument("--splits", type=Path, default=defaults.splits)
     parser.add_argument("--output", type=Path, default=defaults.output)
     parser.add_argument("--history-output", type=Path)
+    parser.add_argument("--history-csv", type=Path)
     parser.add_argument("--model", choices=["unet", "pretrained-unet"], default=defaults.model)
     parser.add_argument("--epochs", type=int, default=defaults.epochs)
     parser.add_argument("--batch-size", type=int, default=defaults.batch_size)
