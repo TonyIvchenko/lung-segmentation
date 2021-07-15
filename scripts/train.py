@@ -173,6 +173,17 @@ def train(args):
             )
             print(f"saved checkpoint to {args.output}")
 
+        if args.save_every > 0 and epoch % args.save_every == 0:
+            snapshot_path = args.output.with_name(
+                f"{args.output.stem}-epoch-{epoch}{args.output.suffix}"
+            )
+            save_checkpoint(
+                path=snapshot_path,
+                model=model,
+                args=vars(args),
+                metrics={"epoch": epoch, "val_jaccard": log_line["val_jaccard"]},
+            )
+
     if args.history_output is not None:
         args.history_output.parent.mkdir(parents=True, exist_ok=True)
         with open(args.history_output, "w", encoding="utf-8") as history_file:
@@ -208,6 +219,7 @@ def parse_args():
     parser.add_argument("--batch-norm", action="store_true")
     parser.add_argument("--pretrained-encoder", action="store_true")
     parser.add_argument("--cpu", action="store_true")
+    parser.add_argument("--save-every", type=int, default=0)
     args = parser.parse_args()
 
     if args.model == "pretrained-unet" and not args.pretrained_encoder:
