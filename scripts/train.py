@@ -118,6 +118,7 @@ def train(args):
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
 
     best_val_jaccard = float("-inf")
+    epochs_without_improvement = 0
     history = []
 
     for epoch in range(1, args.epochs + 1):
@@ -164,6 +165,7 @@ def train(args):
 
         if log_line["val_jaccard"] >= best_val_jaccard:
             best_val_jaccard = log_line["val_jaccard"]
+            epochs_without_improvement = 0
             save_checkpoint(
                 path=args.output,
                 model=model,
@@ -172,11 +174,20 @@ def train(args):
                 history=history,
             )
             print(f"saved checkpoint to {args.output}")
+        else:
+            epochs_without_improvement += 1
 
         if args.save_every > 0 and epoch % args.save_every == 0:
             snapshot_path = args.output.with_name(
                 f"{args.output.stem}-epoch-{epoch}{args.output.suffix}"
             )
+
+        if args.patience > 0 and epochs_without_improvement >= args.patience:
+            print(
+                "early stopping triggered after {count} epochs without validation "
+                "Jaccard improvement".format(count=epochs_without_improvement)
+            )
+            break
             save_checkpoint(
                 path=snapshot_path,
                 model=model,
@@ -220,6 +231,7 @@ def parse_args():
     parser.add_argument("--pretrained-encoder", action="store_true")
     parser.add_argument("--cpu", action="store_true")
     parser.add_argument("--save-every", type=int, default=0)
+    parser.add_argument("--patience", type=int, default=0)
     args = parser.parse_args()
 
     if args.model == "pretrained-unet" and not args.pretrained_encoder:
