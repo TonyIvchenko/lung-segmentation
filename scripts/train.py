@@ -116,6 +116,11 @@ def train(args):
         pretrained=args.pretrained_encoder,
     ).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
+    scheduler = torch.optim.lr_scheduler.StepLR(
+        optimizer,
+        step_size=args.lr_step_size,
+        gamma=args.lr_gamma,
+    )
 
     best_val_jaccard = float("-inf")
     epochs_without_improvement = 0
@@ -162,6 +167,7 @@ def train(args):
                 val_dice=log_line["val_dice"],
             )
         )
+        scheduler.step()
 
         if log_line["val_jaccard"] >= best_val_jaccard:
             best_val_jaccard = log_line["val_jaccard"]
@@ -232,6 +238,8 @@ def parse_args():
     parser.add_argument("--cpu", action="store_true")
     parser.add_argument("--save-every", type=int, default=0)
     parser.add_argument("--patience", type=int, default=0)
+    parser.add_argument("--lr-step-size", type=int, default=25)
+    parser.add_argument("--lr-gamma", type=float, default=0.5)
     args = parser.parse_args()
 
     if args.model == "pretrained-unet" and not args.pretrained_encoder:
