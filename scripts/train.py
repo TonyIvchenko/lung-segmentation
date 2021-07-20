@@ -139,6 +139,8 @@ def train(args):
             logits = model(origins)
             loss = torch.nn.functional.cross_entropy(logits, masks)
             loss.backward()
+            if args.grad_clip > 0:
+                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=args.grad_clip)
             optimizer.step()
 
             num = origins.size(0)
@@ -240,6 +242,7 @@ def parse_args():
     parser.add_argument("--patience", type=int, default=0)
     parser.add_argument("--lr-step-size", type=int, default=25)
     parser.add_argument("--lr-gamma", type=float, default=0.5)
+    parser.add_argument("--grad-clip", type=float, default=0.0)
     args = parser.parse_args()
 
     if args.model == "pretrained-unet" and not args.pretrained_encoder:
