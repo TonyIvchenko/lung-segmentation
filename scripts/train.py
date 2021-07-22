@@ -23,6 +23,15 @@ from src.metrics import dice_from_logits, jaccard_from_logits
 from src.utils import resolve_device, set_seed
 
 
+def iterate_batches(dataloader, progress, desc):
+    if not progress:
+        return dataloader
+
+    from tqdm.auto import tqdm
+
+    return tqdm(dataloader, desc=desc, leave=False)
+
+
 def build_transforms(image_size):
     train_transforms = ComposePair(
         [
@@ -37,7 +46,7 @@ def build_transforms(image_size):
     return train_transforms, eval_transforms
 
 
-def evaluate(model, dataloader, device):
+def evaluate(model, dataloader, device, progress=False):
     model.eval()
     val_loss = 0.0
     val_jaccard = 0.0
@@ -45,7 +54,7 @@ def evaluate(model, dataloader, device):
     total = 0
 
     with torch.no_grad():
-        for origins, masks in dataloader:
+        for origins, masks in iterate_batches(dataloader, progress=progress, desc="val"):
             origins = origins.to(device)
             masks = masks.to(device)
 
@@ -135,7 +144,7 @@ def train(args):
         train_loss = 0.0
         seen = 0
 
-        for origins, masks in dataloaders["train"]:
+        for origins, masks in iterate_batches(dataloaders["train"], progress=args.progress, desc="train"):
             origins = origins.to(device)
             masks = masks.to(device)
 
@@ -151,7 +160,7 @@ def train(args):
             seen += num
             train_loss += loss.item() * num
 
-        val_metrics = evaluate(model, dataloaders["val"], device)
+        val_metrics = evaluate(model, dataloaders["val"], device, progress=args.progress)
         log_line = {
             "epoch": epoch,
             "train_loss": train_loss / seen,
@@ -248,6 +257,7 @@ def parse_args():
     parser.add_argument("--lr-step-size", type=int, default=25)
     parser.add_argument("--lr-gamma", type=float, default=0.5)
     parser.add_argument("--grad-clip", type=float, default=0.0)
+    parser.add_argument("--progress", action="store_true")
     args = parser.parse_args()
 
     if args.model == "pretrained-unet" and not args.pretrained_encoder:
