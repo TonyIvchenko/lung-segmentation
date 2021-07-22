@@ -115,7 +115,11 @@ def train(args):
         upscale_mode=args.upscale_mode,
         pretrained=args.pretrained_encoder,
     ).to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
+    optimizer = torch.optim.Adam(
+        model.parameters(),
+        lr=args.learning_rate,
+        weight_decay=args.weight_decay,
+    )
     scheduler = torch.optim.lr_scheduler.StepLR(
         optimizer,
         step_size=args.lr_step_size,
@@ -231,6 +235,7 @@ def parse_args():
     parser.add_argument("--epochs", type=int, default=defaults.epochs)
     parser.add_argument("--batch-size", type=int, default=defaults.batch_size)
     parser.add_argument("--learning-rate", type=float, default=defaults.learning_rate)
+    parser.add_argument("--weight-decay", type=float, default=0.0)
     parser.add_argument("--image-size", type=int, default=defaults.image_size)
     parser.add_argument("--num-workers", type=int, default=defaults.num_workers)
     parser.add_argument("--seed", type=int, default=defaults.seed)
