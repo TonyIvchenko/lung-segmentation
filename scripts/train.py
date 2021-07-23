@@ -8,7 +8,7 @@ from pathlib import Path
 import torch
 from torch.utils.data import DataLoader
 
-from src.checkpoints import build_model, save_checkpoint
+from src.checkpoints import build_model, load_checkpoint, save_checkpoint
 from src.config import TrainConfig
 from src.data import (
     ComposePair,
@@ -138,8 +138,25 @@ def train(args):
     best_val_jaccard = float("-inf")
     epochs_without_improvement = 0
     history = []
+    start_epoch = 1
 
-    for epoch in range(1, args.epochs + 1):
+    if args.resume is not None:
+        model, checkpoint = load_checkpoint(
+            path=args.resume,
+            model_name=args.model,
+            device=device,
+            batch_norm=args.batch_norm,
+            upscale_mode=args.upscale_mode,
+        )
+        history = checkpoint.get("history", [])
+        best_val_jaccard = checkpoint.get("metrics", {}).get(
+            "best_val_jaccard",
+            best_val_jaccard,
+        )
+        start_epoch = len(history) + 1
+        print(f"resumed from {args.resume}, starting epoch {start_epoch}")
+
+    for epoch in range(start_epoch, args.epochs + 1):
         model.train()
         train_loss = 0.0
         seen = 0
@@ -258,6 +275,7 @@ def parse_args():
     parser.add_argument("--lr-gamma", type=float, default=0.5)
     parser.add_argument("--grad-clip", type=float, default=0.0)
     parser.add_argument("--progress", action="store_true")
+    parser.add_argument("--resume", type=Path)
     args = parser.parse_args()
 
     if args.model == "pretrained-unet" and not args.pretrained_encoder:
