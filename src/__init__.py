@@ -1,5 +1,6 @@
 """Core package for lung segmentation models and utilities."""
 
+from .analysis import confusion_counts, precision_recall_f1
 from .checkpoints import build_model, load_checkpoint, save_checkpoint
 from .config import TrainConfig
 from .data import (
@@ -39,4 +40,6 @@ __all__ = [
     "load_checkpoint",
     "save_checkpoint",
     "TrainConfig",
+    "confusion_counts",
+    "precision_recall_f1",
 ]
