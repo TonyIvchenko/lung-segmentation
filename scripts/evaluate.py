@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import json
 import pickle
 from pathlib import Path
 
@@ -48,6 +49,7 @@ def parse_args():
     parser.add_argument("--num-workers", type=int, default=0)
     parser.add_argument("--image-size", type=int, default=512)
     parser.add_argument("--model", choices=["auto", "unet", "pretrained-unet"], default="auto")
+    parser.add_argument("--output-json", type=Path)
     parser.add_argument("--cpu", action="store_true")
     return parser.parse_args()
 
@@ -90,6 +92,11 @@ def main():
             dice=metrics["dice"],
         )
     )
+
+    if args.output_json is not None:
+        args.output_json.parent.mkdir(parents=True, exist_ok=True)
+        with open(args.output_json, "w", encoding="utf-8") as metrics_file:
+            json.dump(metrics, metrics_file, indent=2)
 
 
 if __name__ == "__main__":
