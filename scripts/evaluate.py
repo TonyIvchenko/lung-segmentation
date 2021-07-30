@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import csv
 import json
 import pickle
 from pathlib import Path
@@ -13,11 +14,12 @@ from src.metrics import dice_from_logits, jaccard_from_logits
 from src.utils import resolve_device
 
 
-def evaluate(model, dataloader, device):
+def evaluate(model, dataloader, device, collect_samples=False):
     total = 0
     total_loss = 0.0
     total_jaccard = 0.0
     total_dice = 0.0
+    per_sample = []
 
     with torch.no_grad():
         for origins, masks in dataloader:
@@ -27,16 +29,26 @@ def evaluate(model, dataloader, device):
             logits = model(origins)
             num = origins.size(0)
 
+            batch_jaccard = jaccard_from_logits(masks.float(), logits).item()
+            batch_dice = dice_from_logits(masks.float(), logits).item()
+
             total += num
             total_loss += torch.nn.functional.cross_entropy(logits, masks).item() * num
-            total_jaccard += jaccard_from_logits(masks.float(), logits).item() * num
-            total_dice += dice_from_logits(masks.float(), logits).item() * num
+            total_jaccard += batch_jaccard * num
+            total_dice += batch_dice * num
 
-    return {
-        "loss": total_loss / total,
-        "jaccard": total_jaccard / total,
-        "dice": total_dice / total,
-    }
+            if collect_samples:
+                for _ in range(num):
+                    per_sample.append({"jaccard": batch_jaccard, "dice": batch_dice})
+
+    return (
+        {
+            "loss": total_loss / total,
+            "jaccard": total_jaccard / total,
+            "dice": total_dice / total,
+        },
+        per_sample,
+    )
 
 
 def parse_args():
@@ -50,6 +62,7 @@ def parse_args():
     parser.add_argument("--image-size", type=int, default=512)
     parser.add_argument("--model", choices=["auto", "unet", "pretrained-unet"], default="auto")
     parser.add_argument("--output-json", type=Path)
+    parser.add_argument("--output-samples-csv", type=Path)
     parser.add_argument("--cpu", action="store_true")
     return parser.parse_args()
 
@@ -83,7 +96,12 @@ def main():
         num_workers=args.num_workers,
     )
 
-    metrics = evaluate(model, dataloader, device)
+    metrics, per_sample = evaluate(
+        model,
+        dataloader,
+        device,
+        collect_samples=args.output_samples_csv is not None,
+    )
     print(
         "{split} metrics: loss={loss:.6f}, jaccard={jaccard:.6f}, dice={dice:.6f}".format(
             split=args.split,
@@ -97,6 +115,13 @@ def main():
         args.output_json.parent.mkdir(parents=True, exist_ok=True)
         with open(args.output_json, "w", encoding="utf-8") as metrics_file:
             json.dump(metrics, metrics_file, indent=2)
+
+    if args.output_samples_csv is not None:
+        args.output_samples_csv.parent.mkdir(parents=True, exist_ok=True)
+        with open(args.output_samples_csv, "w", newline="", encoding="utf-8") as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=["jaccard", "dice"])
+            writer.writeheader()
+            writer.writerows(per_sample)
 
 
 if __name__ == "__main__":
