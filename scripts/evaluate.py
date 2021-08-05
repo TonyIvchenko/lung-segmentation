@@ -8,6 +8,7 @@ from pathlib import Path
 import torch
 from torch.utils.data import DataLoader
 
+from src.analysis import confusion_counts, precision_recall_f1
 from src.checkpoints import load_checkpoint
 from src.data import ComposePair, LungDataset, Resize
 from src.metrics import dice_from_logits, jaccard_from_logits
@@ -19,6 +20,7 @@ def evaluate(model, dataloader, device, collect_samples=False):
     total_loss = 0.0
     total_jaccard = 0.0
     total_dice = 0.0
+    totals = {"tp": 0, "fp": 0, "fn": 0, "tn": 0}
     per_sample = []
 
     with torch.no_grad():
@@ -27,6 +29,7 @@ def evaluate(model, dataloader, device, collect_samples=False):
             masks = masks.to(device)
 
             logits = model(origins)
+            predictions = torch.argmax(logits, dim=1)
             num = origins.size(0)
 
             batch_jaccard = jaccard_from_logits(masks.float(), logits).item()
@@ -41,11 +44,26 @@ def evaluate(model, dataloader, device, collect_samples=False):
                 for _ in range(num):
                     per_sample.append({"jaccard": batch_jaccard, "dice": batch_dice})
 
+            batch_counts = confusion_counts(masks, predictions)
+            for key in totals:
+                totals[key] += batch_counts[key]
+
+    quality = precision_recall_f1(
+        torch.tensor([1] * (totals["tp"] + totals["fn"]) + [0] * (totals["tn"] + totals["fp"])),
+        torch.tensor([1] * totals["tp"] + [0] * totals["fn"] + [0] * totals["tn"] + [1] * totals["fp"]),
+    )
     return (
         {
             "loss": total_loss / total,
             "jaccard": total_jaccard / total,
             "dice": total_dice / total,
+            "precision": quality["precision"],
+            "recall": quality["recall"],
+            "f1": quality["f1"],
+            "tp": totals["tp"],
+            "fp": totals["fp"],
+            "fn": totals["fn"],
+            "tn": totals["tn"],
         },
         per_sample,
     )
