@@ -8,7 +8,7 @@ from pathlib import Path
 import torch
 from torch.utils.data import DataLoader
 
-from src.analysis import confusion_counts, precision_recall_f1
+from src.analysis import confusion_counts, precision_recall_f1_from_counts
 from src.checkpoints import load_checkpoint
 from src.data import ComposePair, LungDataset, Resize
 from src.metrics import dice_from_logits, jaccard_from_logits
@@ -48,9 +48,10 @@ def evaluate(model, dataloader, device, collect_samples=False):
             for key in totals:
                 totals[key] += batch_counts[key]
 
-    quality = precision_recall_f1(
-        torch.tensor([1] * (totals["tp"] + totals["fn"]) + [0] * (totals["tn"] + totals["fp"])),
-        torch.tensor([1] * totals["tp"] + [0] * totals["fn"] + [0] * totals["tn"] + [1] * totals["fp"]),
+    quality = precision_recall_f1_from_counts(
+        tp=totals["tp"],
+        fp=totals["fp"],
+        fn=totals["fn"],
     )
     return (
         {

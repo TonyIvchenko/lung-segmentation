@@ -15,9 +15,18 @@ def confusion_counts(y_true, y_pred, positive_class=1):
 
 def precision_recall_f1(y_true, y_pred, eps=1e-7):
     counts = confusion_counts(y_true, y_pred)
-    tp = counts["tp"]
-    fp = counts["fp"]
-    fn = counts["fn"]
+    return precision_recall_f1_from_counts(
+        tp=counts["tp"],
+        fp=counts["fp"],
+        fn=counts["fn"],
+        eps=eps,
+    )
+
+
+def precision_recall_f1_from_counts(tp, fp, fn, eps=1e-7):
+    tp = float(tp)
+    fp = float(fp)
+    fn = float(fn)
 
     precision = tp / (tp + fp + eps)
     recall = tp / (tp + fn + eps)
