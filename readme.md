@@ -30,6 +30,8 @@ python3 scripts/train.py \
   --output models/unet-cli.pt
 ```
 
+Detailed usage guides are available in [`docs/README.md`](docs/README.md).
+
 ## Proposed solution
 The most obvious solution for semantic segmentation problems is UNet - fully convolutional network with an encoder-decoder path. High-resolution features from the contracting path are combined with the upsampled output in order to predict more precise output based on this information, which is the main idea of this architecture.
 
