@@ -22,3 +22,4 @@ python3 scripts/train.py \
 - `--save-every`: periodic snapshots
 - `--patience`: early stopping by validation Jaccard
 - `--history-output` / `--history-csv`: export epoch metrics
+- `--no-pretrained-encoder`: train pretrained UNet architecture without ImageNet weights
