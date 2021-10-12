@@ -267,7 +267,18 @@ def parse_args():
     parser.add_argument("--seed", type=int, default=defaults.seed)
     parser.add_argument("--upscale-mode", default=defaults.upscale_mode)
     parser.add_argument("--batch-norm", action="store_true")
-    parser.add_argument("--pretrained-encoder", action="store_true")
+    pretrained_group = parser.add_mutually_exclusive_group()
+    pretrained_group.add_argument(
+        "--pretrained-encoder",
+        dest="pretrained_encoder",
+        action="store_true",
+    )
+    pretrained_group.add_argument(
+        "--no-pretrained-encoder",
+        dest="pretrained_encoder",
+        action="store_false",
+    )
+    parser.set_defaults(pretrained_encoder=None)
     parser.add_argument("--cpu", action="store_true")
     parser.add_argument("--save-every", type=int, default=0)
     parser.add_argument("--patience", type=int, default=0)
@@ -278,9 +289,11 @@ def parse_args():
     parser.add_argument("--resume", type=Path)
     args = parser.parse_args()
 
-    if args.model == "pretrained-unet" and not args.pretrained_encoder:
+    if args.model == "pretrained-unet" and args.pretrained_encoder is None:
         # Keep backward-compatible default behavior for pretrained UNet.
         args.pretrained_encoder = True
+    elif args.model == "unet":
+        args.pretrained_encoder = False
 
     return args
 
