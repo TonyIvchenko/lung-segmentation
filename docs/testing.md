@@ -21,3 +21,5 @@ make smoke
 - Utility helpers and analysis functions
 
 Tests use `pytest.importorskip` for optional heavy dependencies.
+
+To run full model/data tests locally, install runtime deps including torch/torchvision.
