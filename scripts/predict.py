@@ -28,6 +28,7 @@ def parse_args():
     parser.add_argument("--image", type=Path, required=True)
     parser.add_argument("--output-mask", type=Path, required=True)
     parser.add_argument("--output-overlay", type=Path)
+    parser.add_argument("--output-probability", type=Path)
     parser.add_argument("--model", choices=["auto", "unet", "pretrained-unet"], default="auto")
     parser.add_argument("--image-size", type=int, default=512)
     parser.add_argument("--cpu", action="store_true")
@@ -52,6 +53,7 @@ def main():
     with torch.no_grad():
         logits = model(input_tensor)
         prediction = torch.argmax(logits, dim=1)[0].cpu()
+        probability = torch.softmax(logits, dim=1)[0, 1].cpu()
 
     args.output_mask.parent.mkdir(parents=True, exist_ok=True)
     mask_image = torchvision.transforms.functional.to_pil_image(prediction.float())
@@ -61,6 +63,11 @@ def main():
         args.output_overlay.parent.mkdir(parents=True, exist_ok=True)
         overlay = blend(origin, mask2=prediction)
         overlay.save(args.output_overlay)
+
+    if args.output_probability is not None:
+        args.output_probability.parent.mkdir(parents=True, exist_ok=True)
+        prob_image = torchvision.transforms.functional.to_pil_image(probability)
+        prob_image.save(args.output_probability)
 
 
 if __name__ == "__main__":
