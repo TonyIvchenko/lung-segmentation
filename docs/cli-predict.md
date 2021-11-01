@@ -15,3 +15,4 @@ python3 scripts/predict.py \
 - Input image is converted to grayscale and resized to `--image-size`.
 - Predicted class map is saved as `--output-mask`.
 - If `--output-overlay` is provided, an RGB blend is saved for quick QA.
+- If `--output-probability` is provided, class-1 softmax probabilities are saved.
