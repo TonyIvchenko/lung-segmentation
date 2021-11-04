@@ -11,7 +11,7 @@ python3 scripts/evaluate.py \
 ```
 
 ## Outputs
-- Printed summary: loss, Jaccard, Dice
+- Printed summary: loss, Jaccard, Dice, precision, recall, F1
 - Optional JSON summary with `--output-json`
 - Optional per-sample CSV with `--output-samples-csv`
 
