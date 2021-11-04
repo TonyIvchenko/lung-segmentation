@@ -122,11 +122,16 @@ def main():
         collect_samples=args.output_samples_csv is not None,
     )
     print(
-        "{split} metrics: loss={loss:.6f}, jaccard={jaccard:.6f}, dice={dice:.6f}".format(
+        "{split} metrics: loss={loss:.6f}, jaccard={jaccard:.6f}, "
+        "dice={dice:.6f}, precision={precision:.6f}, recall={recall:.6f}, "
+        "f1={f1:.6f}".format(
             split=args.split,
             loss=metrics["loss"],
             jaccard=metrics["jaccard"],
             dice=metrics["dice"],
+            precision=metrics["precision"],
+            recall=metrics["recall"],
+            f1=metrics["f1"],
         )
     )
 
