@@ -1,6 +1,6 @@
 PYTHON ?= python3
 
-.PHONY: train evaluate predict make-splits preview test smoke
+.PHONY: train evaluate predict make-splits preview report test smoke
 
 train:
 	$(PYTHON) scripts/train.py
@@ -16,6 +16,9 @@ make-splits:
 
 preview:
 	$(PYTHON) scripts/preview_dataset.py
+
+report:
+	$(PYTHON) scripts/report.py
 
 test:
 	pytest
