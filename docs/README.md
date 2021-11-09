@@ -31,6 +31,7 @@ This folder contains focused guides for common workflows and project maintenance
 - `testing.md`
 - `ci.md`
 - `troubleshooting.md`
+- `reporting.md`
 - `experiment-tracking.md`
 - `contributing.md`
 - `release-checklist.md`
