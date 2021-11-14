@@ -6,7 +6,7 @@ import pickle
 from pathlib import Path
 
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 
 from src.analysis import confusion_counts, precision_recall_f1_from_counts
 from src.checkpoints import load_checkpoint
@@ -79,6 +79,7 @@ def parse_args():
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--num-workers", type=int, default=0)
     parser.add_argument("--image-size", type=int, default=512)
+    parser.add_argument("--max-samples", type=int)
     parser.add_argument("--model", choices=["auto", "unet", "pretrained-unet"], default="auto")
     parser.add_argument("--output-json", type=Path)
     parser.add_argument("--output-samples-csv", type=Path)
@@ -108,6 +109,8 @@ def main():
         args.data_folder / "masks",
         transforms=transforms,
     )
+    if args.max_samples is not None:
+        dataset = Subset(dataset, range(min(args.max_samples, len(dataset))))
     dataloader = DataLoader(
         dataset,
         batch_size=args.batch_size,
