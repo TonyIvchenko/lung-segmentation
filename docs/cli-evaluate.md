@@ -18,3 +18,4 @@ python3 scripts/evaluate.py \
 ## Notes
 - `--model auto` infers architecture from checkpoint metadata when available.
 - Use `--cpu` for CPU-only environments.
+- Use `--max-samples` for quick smoke evaluations on a subset.
