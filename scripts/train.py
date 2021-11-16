@@ -6,7 +6,7 @@ import pickle
 from pathlib import Path
 
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 
 from src.checkpoints import build_model, load_checkpoint, save_checkpoint
 from src.config import TrainConfig
@@ -100,6 +100,15 @@ def train(args):
             transforms=eval_transforms,
         ),
     }
+    if args.max_samples is not None:
+        datasets["train"] = Subset(
+            datasets["train"],
+            range(min(args.max_samples, len(datasets["train"]))),
+        )
+        datasets["val"] = Subset(
+            datasets["val"],
+            range(min(args.max_samples, len(datasets["val"]))),
+        )
 
     dataloaders = {
         "train": DataLoader(
@@ -264,6 +273,7 @@ def parse_args():
     parser.add_argument("--weight-decay", type=float, default=0.0)
     parser.add_argument("--image-size", type=int, default=defaults.image_size)
     parser.add_argument("--num-workers", type=int, default=defaults.num_workers)
+    parser.add_argument("--max-samples", type=int)
     parser.add_argument("--seed", type=int, default=defaults.seed)
     parser.add_argument("--upscale-mode", default=defaults.upscale_mode)
     parser.add_argument("--batch-norm", action="store_true")
