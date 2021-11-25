@@ -23,3 +23,4 @@ python3 scripts/train.py \
 - `--patience`: early stopping by validation Jaccard
 - `--history-output` / `--history-csv`: export epoch metrics
 - `--no-pretrained-encoder`: train pretrained UNet architecture without ImageNet weights
+- `--max-samples`: run smoke training on a reduced subset
