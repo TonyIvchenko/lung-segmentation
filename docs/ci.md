@@ -11,6 +11,7 @@ GitHub Actions workflow: `.github/workflows/tests.yml`
 2. Setup Python
 3. Install test dependency (`pytest`)
 4. Run unit tests
+5. Run compile smoke check (`python -m compileall src scripts tests`)
 
 ## Extending CI
 - Add linting stage
