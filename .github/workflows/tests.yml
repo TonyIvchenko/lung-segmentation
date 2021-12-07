@@ -23,3 +23,6 @@ jobs:
 
       - name: Run tests
         run: pytest
+
+      - name: Compile smoke check
+        run: python -m compileall src scripts tests
