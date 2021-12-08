@@ -19,3 +19,4 @@ Saved checkpoints are standard PyTorch dictionaries.
 
 ## Compatibility
 The loader can infer model type from checkpoint `args` when `--model auto` is used.
+Batch norm and upsampling mode can also be inferred from checkpoint args metadata.
