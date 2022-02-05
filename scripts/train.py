@@ -228,6 +228,14 @@ def train(args):
             snapshot_path = args.output.with_name(
                 f"{args.output.stem}-epoch-{epoch}{args.output.suffix}"
             )
+            save_checkpoint(
+                path=snapshot_path,
+                model=model,
+                args=vars(args),
+                metrics={"epoch": epoch, "val_jaccard": log_line["val_jaccard"]},
+                history=history,
+            )
+            print(f"saved snapshot checkpoint to {snapshot_path}")
 
         if args.patience > 0 and epochs_without_improvement >= args.patience:
             print(
@@ -235,12 +243,6 @@ def train(args):
                 "Jaccard improvement".format(count=epochs_without_improvement)
             )
             break
-            save_checkpoint(
-                path=snapshot_path,
-                model=model,
-                args=vars(args),
-                metrics={"epoch": epoch, "val_jaccard": log_line["val_jaccard"]},
-            )
 
     if args.history_output is not None:
         args.history_output.parent.mkdir(parents=True, exist_ok=True)
