@@ -40,3 +40,43 @@ def test_predict_accepts_probability_output(monkeypatch):
     )
     args = predict.parse_args()
     assert str(args.output_probability).endswith("prob.png")
+
+
+def test_predict_accepts_directory_batch_mode(monkeypatch):
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "predict.py",
+            "--checkpoint",
+            "model.pt",
+            "--image-dir",
+            "images",
+            "--output-mask-dir",
+            "masks",
+            "--glob",
+            "*_z*.png",
+        ],
+    )
+    args = predict.parse_args()
+    assert str(args.image_dir).endswith("images")
+    assert str(args.output_mask_dir).endswith("masks")
+    assert args.glob == "*_z*.png"
+
+
+def test_predict_rejects_single_output_in_directory_mode(monkeypatch):
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "predict.py",
+            "--checkpoint",
+            "model.pt",
+            "--image-dir",
+            "images",
+            "--output-mask-dir",
+            "masks",
+            "--output-mask",
+            "single.png",
+        ],
+    )
+    with pytest.raises(SystemExit):
+        predict.parse_args()
