@@ -1,4 +1,5 @@
 import pytest
+import json
 
 from scripts import build_pair_index
 
@@ -42,3 +43,29 @@ def test_build_pairs_strict_mode_raises_on_missing_masks(tmp_path):
 
     with pytest.raises(ValueError):
         build_pair_index.build_pairs(images, masks, strict=True)
+
+
+def test_main_writes_pair_index_payload(tmp_path, monkeypatch):
+    images = tmp_path / "images"
+    masks = tmp_path / "masks"
+    output = tmp_path / "pairs.json"
+    _touch(images / "case001.png")
+    _touch(masks / "case001.png")
+
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "build_pair_index.py",
+            "--images-folder",
+            str(images),
+            "--masks-folder",
+            str(masks),
+            "--output",
+            str(output),
+        ],
+    )
+    build_pair_index.main()
+
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    assert payload["pairs"] == [["case001", "case001"]]
+    assert payload["missing_masks"] == []
