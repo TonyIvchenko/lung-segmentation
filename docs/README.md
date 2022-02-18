@@ -9,6 +9,7 @@ This folder contains focused guides for common workflows and project maintenance
 - `cli-splits.md`
 - `cli-preview.md`
 - `inference-batch.md`
+- `multi-repo-workflow.md`
 - `migration.md`
 - `notebook-parity.md`
 

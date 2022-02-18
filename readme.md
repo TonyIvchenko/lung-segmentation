@@ -18,6 +18,7 @@ The repository now includes reusable command-line scripts in `scripts/`:
 - `scripts/evaluate.py` - compute loss/Jaccard/Dice for a checkpoint on any split
 - `scripts/predict.py` - infer masks for single images and optionally save overlays
 - `scripts/preview_dataset.py` - export a visual preview of sampled training pairs
+- `scripts/build_pair_index.py` - align converted image/mask slices into a JSON pair index
 
 Example:
 
@@ -31,6 +32,8 @@ python3 scripts/train.py \
 ```
 
 Detailed usage guides are available in [`docs/README.md`](docs/README.md).
+For integration with `nifti-image-converter` and `lungmask`, see
+[`docs/multi-repo-workflow.md`](docs/multi-repo-workflow.md).
 
 ## Proposed solution
 The most obvious solution for semantic segmentation problems is UNet - fully convolutional network with an encoder-decoder path. High-resolution features from the contracting path are combined with the upsampled output in order to predict more precise output based on this information, which is the main idea of this architecture.
