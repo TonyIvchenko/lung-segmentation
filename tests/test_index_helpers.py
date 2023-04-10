@@ -1,0 +1,23 @@
+from importlib.util import module_from_spec, spec_from_file_location
+from pathlib import Path
+
+
+MODULE_PATH = Path(__file__).resolve().parents[1] / "scripts" / "index_helpers.py"
+SPEC = spec_from_file_location("index_helpers", MODULE_PATH)
+index_helpers = module_from_spec(SPEC)
+assert SPEC.loader is not None
+SPEC.loader.exec_module(index_helpers)
+
+
+def _sample_payload():
+    return {
+        "images_folder": "images",
+        "masks_folder": "masks",
+        "pairs": [
+            ["alpha", "alpha"],
+            ["beta", "beta"],
+            ["beta", "beta_alt"],
+            ["gamma", "gamma"],
+        ],
+        "missing_masks": ["delta", "omega"],
+    }
