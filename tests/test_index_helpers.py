@@ -25,3 +25,7 @@ def _sample_payload():
 
 def test_index_pairs():
     assert len(index_helpers.index_pairs(_sample_payload())) == 4
+
+
+def test_index_missing_masks():
+    assert index_helpers.index_missing_masks(_sample_payload()) == ["delta", "omega"]
