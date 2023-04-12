@@ -29,3 +29,7 @@ def test_index_pairs():
 
 def test_index_missing_masks():
     assert index_helpers.index_missing_masks(_sample_payload()) == ["delta", "omega"]
+
+
+def test_index_pair_count():
+    assert index_helpers.index_pair_count(_sample_payload()) == 4
