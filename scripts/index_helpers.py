@@ -15,3 +15,7 @@ def index_pairs(payload):
 
 def index_missing_masks(payload):
     return _missing(payload)
+
+
+def index_pair_count(payload):
+    return len(_pairs(payload))
