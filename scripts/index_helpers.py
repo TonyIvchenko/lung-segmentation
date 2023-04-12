@@ -11,3 +11,7 @@ def _missing(payload):
 
 def index_pairs(payload):
     return _pairs(payload)
+
+
+def index_missing_masks(payload):
+    return _missing(payload)
