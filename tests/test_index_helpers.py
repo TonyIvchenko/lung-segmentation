@@ -33,3 +33,7 @@ def test_index_missing_masks():
 
 def test_index_pair_count():
     assert index_helpers.index_pair_count(_sample_payload()) == 4
+
+
+def test_index_missing_count():
+    assert index_helpers.index_missing_count(_sample_payload()) == 2
