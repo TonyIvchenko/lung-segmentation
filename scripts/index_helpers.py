@@ -23,3 +23,7 @@ def index_pair_count(payload):
 
 def index_missing_count(payload):
     return len(_missing(payload))
+
+
+def index_origin_names(payload):
+    return [pair[0] for pair in _pairs(payload)]
