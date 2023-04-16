@@ -37,3 +37,7 @@ def test_index_pair_count():
 
 def test_index_missing_count():
     assert index_helpers.index_missing_count(_sample_payload()) == 2
+
+
+def test_index_origin_names():
+    assert index_helpers.index_origin_names(_sample_payload()) == ["alpha", "beta", "beta", "gamma"]
