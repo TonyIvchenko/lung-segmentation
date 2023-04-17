@@ -27,3 +27,7 @@ def index_missing_count(payload):
 
 def index_origin_names(payload):
     return [pair[0] for pair in _pairs(payload)]
+
+
+def index_mask_names(payload):
+    return [pair[1] for pair in _pairs(payload)]
