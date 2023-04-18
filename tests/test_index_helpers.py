@@ -41,3 +41,7 @@ def test_index_missing_count():
 
 def test_index_origin_names():
     assert index_helpers.index_origin_names(_sample_payload()) == ["alpha", "beta", "beta", "gamma"]
+
+
+def test_index_mask_names():
+    assert index_helpers.index_mask_names(_sample_payload()) == ["alpha", "beta", "beta_alt", "gamma"]
