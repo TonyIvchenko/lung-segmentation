@@ -45,3 +45,7 @@ def test_index_origin_names():
 
 def test_index_mask_names():
     assert index_helpers.index_mask_names(_sample_payload()) == ["alpha", "beta", "beta_alt", "gamma"]
+
+
+def test_index_has_duplicate_origins():
+    assert index_helpers.index_has_duplicate_origins(_sample_payload()) is True
