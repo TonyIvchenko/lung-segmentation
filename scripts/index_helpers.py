@@ -36,3 +36,8 @@ def index_mask_names(payload):
 def index_has_duplicate_origins(payload):
     origins = index_origin_names(payload)
     return len(origins) != len(set(origins))
+
+
+def index_has_duplicate_masks(payload):
+    masks = index_mask_names(payload)
+    return len(masks) != len(set(masks))
