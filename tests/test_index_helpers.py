@@ -49,3 +49,7 @@ def test_index_mask_names():
 
 def test_index_has_duplicate_origins():
     assert index_helpers.index_has_duplicate_origins(_sample_payload()) is True
+
+
+def test_index_has_duplicate_masks():
+    assert index_helpers.index_has_duplicate_masks(_sample_payload()) is False
