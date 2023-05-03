@@ -41,3 +41,7 @@ def index_has_duplicate_origins(payload):
 def index_has_duplicate_masks(payload):
     masks = index_mask_names(payload)
     return len(masks) != len(set(masks))
+
+
+def index_same_stem_pairs(payload):
+    return [pair for pair in _pairs(payload) if pair[0] == pair[1]]
