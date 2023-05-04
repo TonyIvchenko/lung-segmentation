@@ -45,3 +45,7 @@ def index_has_duplicate_masks(payload):
 
 def index_same_stem_pairs(payload):
     return [pair for pair in _pairs(payload) if pair[0] == pair[1]]
+
+
+def index_mismatched_stem_pairs(payload):
+    return [pair for pair in _pairs(payload) if pair[0] != pair[1]]
