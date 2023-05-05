@@ -57,3 +57,7 @@ def test_index_has_duplicate_masks():
 
 def test_index_same_stem_pairs():
     assert index_helpers.index_same_stem_pairs(_sample_payload()) == [["alpha", "alpha"], ["beta", "beta"], ["gamma", "gamma"]]
+
+
+def test_index_mismatched_stem_pairs():
+    assert index_helpers.index_mismatched_stem_pairs(_sample_payload()) == [["beta", "beta_alt"]]
