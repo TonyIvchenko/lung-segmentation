@@ -61,3 +61,7 @@ def test_index_same_stem_pairs():
 
 def test_index_mismatched_stem_pairs():
     assert index_helpers.index_mismatched_stem_pairs(_sample_payload()) == [["beta", "beta_alt"]]
+
+
+def test_index_missing_ratio():
+    assert abs(index_helpers.index_missing_ratio(_sample_payload()) - (2 / 6)) < 1e-9
