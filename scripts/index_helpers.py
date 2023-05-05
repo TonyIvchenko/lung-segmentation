@@ -49,3 +49,10 @@ def index_same_stem_pairs(payload):
 
 def index_mismatched_stem_pairs(payload):
     return [pair for pair in _pairs(payload) if pair[0] != pair[1]]
+
+
+def index_missing_ratio(payload):
+    total = index_pair_count(payload) + index_missing_count(payload)
+    if total == 0:
+        return 0.0
+    return index_missing_count(payload) / total
