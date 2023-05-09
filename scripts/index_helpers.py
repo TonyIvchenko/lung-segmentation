@@ -56,3 +56,10 @@ def index_missing_ratio(payload):
     if total == 0:
         return 0.0
     return index_missing_count(payload) / total
+
+
+def index_same_stem_ratio(payload):
+    total = index_pair_count(payload)
+    if total == 0:
+        return 0.0
+    return len(index_same_stem_pairs(payload)) / total
