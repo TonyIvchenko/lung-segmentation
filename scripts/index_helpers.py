@@ -63,3 +63,7 @@ def index_same_stem_ratio(payload):
     if total == 0:
         return 0.0
     return len(index_same_stem_pairs(payload)) / total
+
+
+def index_pairs_with_prefix(payload, prefix):
+    return [pair for pair in _pairs(payload) if pair[0].startswith(prefix)]
