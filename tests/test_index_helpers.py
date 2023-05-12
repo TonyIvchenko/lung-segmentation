@@ -69,3 +69,7 @@ def test_index_missing_ratio():
 
 def test_index_same_stem_ratio():
     assert abs(index_helpers.index_same_stem_ratio(_sample_payload()) - 0.75) < 1e-9
+
+
+def test_index_pairs_with_prefix():
+    assert index_helpers.index_pairs_with_prefix(_sample_payload(), "b") == [["beta", "beta"], ["beta", "beta_alt"]]
