@@ -67,3 +67,7 @@ def index_same_stem_ratio(payload):
 
 def index_pairs_with_prefix(payload, prefix):
     return [pair for pair in _pairs(payload) if pair[0].startswith(prefix)]
+
+
+def index_validate_unique_origins(payload):
+    return not index_has_duplicate_origins(payload)
