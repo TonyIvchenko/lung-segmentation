@@ -71,3 +71,12 @@ def index_pairs_with_prefix(payload, prefix):
 
 def index_validate_unique_origins(payload):
     return not index_has_duplicate_origins(payload)
+
+
+def index_summary(payload):
+    return {
+        "pairs": index_pair_count(payload),
+        "missing_masks": index_missing_count(payload),
+        "same_stem_pairs": len(index_same_stem_pairs(payload)),
+        "missing_ratio": index_missing_ratio(payload),
+    }
