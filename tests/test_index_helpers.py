@@ -73,3 +73,7 @@ def test_index_same_stem_ratio():
 
 def test_index_pairs_with_prefix():
     assert index_helpers.index_pairs_with_prefix(_sample_payload(), "b") == [["beta", "beta"], ["beta", "beta_alt"]]
+
+
+def test_index_validate_unique_origins():
+    assert index_helpers.index_validate_unique_origins(_sample_payload()) is False
