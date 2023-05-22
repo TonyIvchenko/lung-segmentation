@@ -77,3 +77,12 @@ def test_index_pairs_with_prefix():
 
 def test_index_validate_unique_origins():
     assert index_helpers.index_validate_unique_origins(_sample_payload()) is False
+
+
+def test_index_summary():
+    assert index_helpers.index_summary(_sample_payload()) == {
+        "pairs": 4,
+        "missing_masks": 2,
+        "same_stem_pairs": 3,
+        "missing_ratio": 2 / 6,
+    }
