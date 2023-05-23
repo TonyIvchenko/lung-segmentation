@@ -80,3 +80,12 @@ def index_summary(payload):
         "same_stem_pairs": len(index_same_stem_pairs(payload)),
         "missing_ratio": index_missing_ratio(payload),
     }
+
+
+def index_description(payload):
+    summary = index_summary(payload)
+    return (
+        f"pairs={summary['pairs']} "
+        f"missing={summary['missing_masks']} "
+        f"same_stem={summary['same_stem_pairs']}"
+    )
