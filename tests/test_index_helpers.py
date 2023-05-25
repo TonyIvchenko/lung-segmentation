@@ -86,3 +86,9 @@ def test_index_summary():
         "same_stem_pairs": 3,
         "missing_ratio": 2 / 6,
     }
+
+
+def test_index_description():
+    text = index_helpers.index_description(_sample_payload())
+    assert "pairs=4" in text
+    assert "missing=2" in text
