@@ -3,6 +3,7 @@ import argparse
 import json
 from pathlib import Path
 
+from scripts.index_helpers import index_summary
 from scripts.make_splits import origin_name_from_mask
 
 
@@ -66,11 +67,13 @@ def main():
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
+    summary = index_summary(payload)
     print(
-        "saved pair index to {path}: pairs={pairs}, missing_masks={missing}".format(
+        "saved pair index to {path}: pairs={pairs}, missing_masks={missing}, missing_ratio={ratio:.3f}".format(
             path=args.output,
-            pairs=len(pairs),
-            missing=len(missing),
+            pairs=summary["pairs"],
+            missing=summary["missing_masks"],
+            ratio=summary["missing_ratio"],
         )
     )
 
